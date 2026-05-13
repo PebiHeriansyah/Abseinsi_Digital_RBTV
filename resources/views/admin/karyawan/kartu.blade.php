@@ -80,7 +80,7 @@ body {
 
 /* NAMA DEPAN */
 .nama-depan {
-    font-size: 14pt; 
+    font-size: 14pt;
     font-weight: bold;
     color: #333333;
     text-transform: capitalize;
@@ -91,9 +91,9 @@ body {
 
 /* NAMA BELAKANG */
 .nama-belakang {
-    font-size: 11pt; 
-    font-weight: normal; 
-    color: #555555; 
+    font-size: 11pt;
+    font-weight: normal;
+    color: #555555;
     text-transform: capitalize;
     line-height: 1;
     margin-top: 2px;
@@ -117,17 +117,21 @@ body {
 /* QR BELAKANG */
 .qr-container {
     position: absolute;
-    top: 30mm;
+    top: 18mm;
     left: 50%;
     transform: translateX(-50%);
+    width: 34mm;
+    height: 34mm;
+    background: white;
+    border: 1px solid #cccccc;
+    padding: 2mm;
 }
 
-.qr-container img {
-    width: 30mm;
-    height: 30mm;
-    border: 1px solid #000;
-    padding: 2mm;
-    background: white;
+/* Pastikan SVG di dalam qr-container mengisi penuh */
+.qr-container svg {
+    width: 100%;
+    height: 100%;
+    display: block;
 }
 
 .page-break {
@@ -138,6 +142,9 @@ body {
 
 <body>
 
+{{-- ======================== --}}
+{{-- HALAMAN DEPAN KARTU     --}}
+{{-- ======================== --}}
 <div class="card">
 
     <div class="header">
@@ -150,11 +157,9 @@ body {
     @endif
 
     <div class="content">
-        {{-- MENGGUNAKAN KOLOM NAMA DEPAN DAN BELAKANG DARI DATABASE --}}
-        
         {{-- NAMA DEPAN --}}
         <div class="nama-depan">{{ $karyawan->nama_depan }}</div>
-        
+
         {{-- NAMA BELAKANG --}}
         @if($karyawan->nama_belakang)
             <div class="nama-belakang">{{ $karyawan->nama_belakang }}</div>
@@ -172,12 +177,16 @@ body {
 
 <div class="page-break"></div>
 
+{{-- ======================== --}}
+{{-- HALAMAN BELAKANG (QR)   --}}
+{{-- ======================== --}}
 <div class="card">
 
     <div class="header"></div>
 
+    {{-- QR CODE — inline SVG langsung, tanpa HTTP request --}}
     <div class="qr-container">
-        <img src="{{ $qrBase64 }}">
+        {!! $qrSvg !!}
     </div>
 
 </div>

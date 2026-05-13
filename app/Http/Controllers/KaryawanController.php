@@ -8,6 +8,10 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use BaconQrCode\Renderer\Image\SvgImageBackEnd;
+use BaconQrCode\Renderer\ImageRenderer;
+use BaconQrCode\Renderer\RendererStyle\RendererStyle;
+use BaconQrCode\Writer;
 
 class KaryawanController extends Controller
 {
@@ -132,46 +136,50 @@ class KaryawanController extends Controller
         $karyawan = Karyawan::findOrFail($id);
 
         // =====================================================
-        // FOTO KARYAWAN
-        // Ambil langsung dari URL publik Supabase via cURL
-        // (lebih reliable daripada Storage::disk() di serverless)
+        // QR CODE — dibuat LOKAL pakai BaconQrCode (SVG)
+        // ZERO HTTP request: tidak butuh internet sama sekali
+        // =====================================================
+        $renderer = new ImageRenderer(
+            new RendererStyle(150),
+            new SvgImageBackEnd()
+        );
+        $writer = new Writer($renderer);
+        $qrSvg  = $writer->writeString($karyawan->nik);
+
+        // =====================================================
+        // FOTO KARYAWAN — ambil dari Supabase dengan timeout singkat
         // =====================================================
         $fotoBase64 = null;
         if (!empty($karyawan->foto)) {
             try {
                 $supabasePublicUrl = env('SUPABASE_STORAGE_URL', '');
                 if ($supabasePublicUrl) {
-                    $fotoUrl  = rtrim($supabasePublicUrl, '/') . '/' . ltrim($karyawan->foto, '/');
-                    $fotoData = $this->fetchUrlAsBase64($fotoUrl);
-                    if ($fotoData) {
-                        $ext = strtolower(pathinfo($karyawan->foto, PATHINFO_EXTENSION)) ?: 'jpeg';
+                    $fotoUrl = rtrim($supabasePublicUrl, '/') . '/' . ltrim($karyawan->foto, '/');
+                    $ch = curl_init();
+                    curl_setopt_array($ch, [
+                        CURLOPT_URL            => $fotoUrl,
+                        CURLOPT_RETURNTRANSFER => true,
+                        CURLOPT_FOLLOWLOCATION => true,
+                        CURLOPT_TIMEOUT        => 5,  // timeout singkat
+                        CURLOPT_SSL_VERIFYPEER => false,
+                    ]);
+                    $fotoData = curl_exec($ch);
+                    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                    curl_close($ch);
+
+                    if ($fotoData && $httpCode >= 200 && $httpCode < 300) {
+                        $ext  = strtolower(pathinfo($karyawan->foto, PATHINFO_EXTENSION)) ?: 'jpeg';
                         $mime = in_array($ext, ['jpg', 'jpeg']) ? 'jpeg' : $ext;
-                        $fotoBase64 = 'data:image/' . $mime . ';base64,' . $fotoData;
+                        $fotoBase64 = 'data:image/' . $mime . ';base64,' . base64_encode($fotoData);
                     }
                 }
             } catch (\Exception $e) {
-                $fotoBase64 = null;
+                $fotoBase64 = null; // kartu tetap dicetak tanpa foto
             }
-        }
-
-        // =====================================================
-        // QR CODE
-        // Gunakan cURL (file_get_contents diblokir di Vercel)
-        // =====================================================
-        $qrBase64 = null;
-        try {
-            $qrUrl  = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' . urlencode($karyawan->nik);
-            $qrData = $this->fetchUrlAsBase64($qrUrl);
-            if ($qrData) {
-                $qrBase64 = 'data:image/png;base64,' . $qrData;
-            }
-        } catch (\Exception $e) {
-            $qrBase64 = null;
         }
 
         // =====================================================
         // LOGO — file lokal, encode base64 agar DomPDF render
-        // (DomPDF tidak bisa load file via path relatif di Vercel)
         // =====================================================
         $logoBase64 = null;
         $logoPath   = public_path('images/RBTV.png');
@@ -179,39 +187,10 @@ class KaryawanController extends Controller
             $logoBase64 = 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath));
         }
 
-        // Pastikan DomPDF menulis font ke /tmp (writable di Vercel)
-        // Path ini di-configure di config/dompdf.php
-        $pdf = Pdf::loadView('admin.karyawan.kartu', compact('karyawan', 'fotoBase64', 'qrBase64', 'logoBase64'))
+        $pdf = Pdf::loadView('admin.karyawan.kartu', compact('karyawan', 'fotoBase64', 'qrSvg', 'logoBase64'))
             ->setPaper([0, 0, 153.07, 242.65], 'portrait');
 
         return $pdf->stream('kartu-' . $karyawan->nama_depan . '.pdf');
-    }
-
-    /**
-     * Fetch konten URL menggunakan cURL dan return sebagai base64.
-     * Digunakan karena file_get_contents() untuk URL eksternal
-     * tidak berfungsi di serverless environment (Vercel).
-     */
-    private function fetchUrlAsBase64(string $url): ?string
-    {
-        $ch = curl_init();
-        curl_setopt_array($ch, [
-            CURLOPT_URL            => $url,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_TIMEOUT        => 15,
-            CURLOPT_SSL_VERIFYPEER => true,
-            CURLOPT_USERAGENT      => 'Mozilla/5.0 (compatible; AbsensiRBTV/1.0)',
-        ]);
-        $data     = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
-
-        if ($data === false || $httpCode < 200 || $httpCode >= 300) {
-            return null;
-        }
-
-        return base64_encode($data);
     }
 
     public function destroy(Request $request, $id)

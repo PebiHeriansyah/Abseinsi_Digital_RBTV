@@ -5,7 +5,8 @@
   "functions": {
     "api/index.php": {
       "runtime": "vercel-php@0.7.2",
-      "excludeFiles": "node_modules/**"
+      "excludeFiles": "node_modules/**",
+      "maxDuration": 60
     }
   },
   "routes": [
