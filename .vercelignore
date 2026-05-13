@@ -1,26 +1,30 @@
-# Dependencies (akan di-install saat build)
+# Node modules - JANGAN upload ke Vercel (di-install saat build)
 node_modules/
 
-# Storage (ephemeral di Vercel, gunakan Supabase Storage)
+# Storage lokal (gunakan Supabase Storage di production)
 storage/app/public/
-
-# Cache dan log lokal
 storage/framework/cache/
 storage/framework/sessions/
 storage/framework/views/
 storage/logs/
 
-# Database SQLite lokal
+# Asset template berat yang di-serve langsung oleh CDN Vercel, bukan PHP function
+public/gradient/
+public/monster/
+public/sneat/
+
+# Database lokal
 database/database.sqlite
 
 # Test files
 tests/
 
-# IDE files
+# IDE & OS files
 .idea/
 .vscode/
 .nova/
-
-# OS files
 .DS_Store
 Thumbs.db
+
+# Git
+.git/
