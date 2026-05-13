@@ -38,7 +38,7 @@
     "SUPABASE_S3_REGION": "ap-south-1",
     "SUPABASE_S3_BUCKET": "absensi-rbtv",
     "SUPABASE_S3_ENDPOINT": "https://ubzqxbnlzqglwwmyjpvc.storage.supabase.co/storage/v1/s3",
-    "SUPABASE_STORAGE_URL": "https://ubzqxbnlzqglwwmyjpvc.supabase.co/storage/v1/object/public",
+    "SUPABASE_STORAGE_URL": "https://ubzqxbnlzqglwwmyjpvc.supabase.co/storage/v1/object/public/absensi-rbtv",
     "CACHE_DRIVER": "file",
     "CACHE_STORE": "file",
     "DB_SSLMODE": "require",

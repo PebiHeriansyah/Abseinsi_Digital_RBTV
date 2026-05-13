@@ -3,7 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="no">
+    <meta name="apple-mobile-web-app-capable" content="no">
     <title>Absensi Digital</title>
+    <script>
+        // Cegah browser menampilkan prompt "Install App / Add to Home Screen"
+        window.addEventListener('beforeinstallprompt', function(e) {
+            e.preventDefault();
+            return false;
+        });
+    </script>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
