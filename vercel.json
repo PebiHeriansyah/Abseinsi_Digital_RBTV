@@ -54,6 +54,6 @@
     "SUPABASE_STORAGE_URL": "https://ubzqxbnlzqglwwmyjpvc.supabase.co/storage/v1/object/public",
     "CACHE_DRIVER": "file",
     "CACHE_STORE": "file",
-    "DB_SSLMODE": "verify-full"
+    "DB_SSLMODE": "require"
   }
 }
