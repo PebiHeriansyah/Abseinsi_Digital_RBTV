@@ -15,6 +15,13 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
+        /* Menyesuaikan skala keseluruhan halaman login agar konsisten dengan dashboard (85%) */
+        @media (min-width: 992px) {
+            html {
+                zoom: 0.85;
+            }
+        }
+
         body, html {
             margin: 0;
             padding: 0;
