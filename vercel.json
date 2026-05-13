@@ -41,7 +41,7 @@
     "DB_HOST": "aws-0-ap-south-1.pooler.supabase.com",
     "DB_PORT": "6543",
     "DB_DATABASE": "postgres",
-    "DB_USERNAME": "postgres",
+    "DB_USERNAME": "postgres.ubzqxbnlzqglwwmyjpvc",
     "DB_PASSWORD": "#0987654123Feby",
     "SESSION_DRIVER": "cookie",
     "SESSION_LIFETIME": "120",
