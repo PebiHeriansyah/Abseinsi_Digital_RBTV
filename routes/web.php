@@ -1,38 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Artisan;
-
-// TEMPORARY: Migration endpoint (hapus setelah berhasil migrate)
-Route::get('/setup-db', function () {
-    $secret = request('key');
-    $expected = env('MIGRATE_SECRET', 'rbtv-migrate-2024');
-    
-    if ($secret !== $expected) {
-        abort(403, 'Unauthorized');
-    }
-    
-    $output = [];
-    try {
-        Artisan::call('migrate', ['--force' => true]);
-        $output[] = 'migrate: ' . Artisan::output();
-        
-        Artisan::call('db:seed', ['--force' => true]);
-        $output[] = 'seed: ' . Artisan::output();
-        
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Database migrated and seeded!',
-            'output' => $output,
-        ]);
-    } catch (\Exception $e) {
-        return response()->json([
-            'status' => 'error',
-            'message' => $e->getMessage(),
-            'output' => $output,
-        ], 500);
-    }
-});
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KaryawanController;
 use App\Http\Controllers\AbsensiController;
