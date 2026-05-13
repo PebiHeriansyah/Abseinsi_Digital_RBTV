@@ -97,6 +97,10 @@ return [
             'prefix_indexes' => true,
             'search_path' => 'public',
             'sslmode' => env('DB_SSLMODE', 'prefer'),
+            // Wajib untuk Supabase Connection Pooler (PgBouncer Transaction Mode)
+            'options' => [
+                PDO::ATTR_EMULATE_PREPARES => true,
+            ],
         ],
 
         'sqlsrv' => [
