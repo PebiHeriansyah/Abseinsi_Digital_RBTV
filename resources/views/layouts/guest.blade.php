@@ -15,6 +15,13 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
+        /* Menyesuaikan skala keseluruhan agar tidak terlalu besar di Desktop */
+        @media (min-width: 992px) {
+            html {
+                zoom: 0.9;
+            }
+        }
+
         body, html {
             margin: 0;
             padding: 0;

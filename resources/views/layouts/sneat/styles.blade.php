@@ -13,6 +13,13 @@
 @stack('page-style')
 
 <style>
+    /* Menyesuaikan skala / ukuran keseluruhan website di Desktop (agar tidak terlalu besar) */
+    @media (min-width: 992px) {
+        html {
+            zoom: 0.85;
+        }
+    }
+
     /* Mengubah warna latar belakang utama dan teks */
     html.dark-style body {
         background-color: #232333 !important;
