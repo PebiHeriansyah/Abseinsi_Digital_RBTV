@@ -38,11 +38,11 @@
     "APP_URL": "https://abseinsi-digital-rbtv.vercel.app",
     "LOG_CHANNEL": "stderr",
     "DB_CONNECTION": "pgsql",
-    "DB_HOST": "db.ubzqxbnlzqglwwmyjpvc.supabase.co",
-    "DB_PORT": "6543",
-    "DB_DATABASE": "postgres",
-    "DB_USERNAME": "postgres",
-    "DB_PASSWORD": "#0987654123Feby",
+    "DB_HOST": "ep-empty-dew-aoy34ygr-pooler.c-2.ap-southeast-1.aws.neon.tech",
+    "DB_PORT": "5432",
+    "DB_DATABASE": "neondb",
+    "DB_USERNAME": "neondb_owner",
+    "DB_PASSWORD": "npg_zb2Uh1WvjXSt",
     "SESSION_DRIVER": "cookie",
     "SESSION_LIFETIME": "120",
     "FILESYSTEM_DISK": "supabase",
@@ -54,6 +54,6 @@
     "SUPABASE_STORAGE_URL": "https://ubzqxbnlzqglwwmyjpvc.supabase.co/storage/v1/object/public",
     "CACHE_DRIVER": "file",
     "CACHE_STORE": "file",
-    "DB_SSLMODE": "require"
+    "DB_SSLMODE": "verify-full"
   }
 }
