@@ -4,17 +4,7 @@
   "framework": null,
   "functions": {
     "api/index.php": {
-      "runtime": "vercel-php@0.7.2",
-      "excludeFiles": [
-        "node_modules/**",
-        "tests/**",
-        ".git/**",
-        "storage/app/**",
-        "storage/framework/cache/**",
-        "storage/framework/sessions/**",
-        "storage/logs/**",
-        "database/**"
-      ]
+      "runtime": "vercel-php@0.7.2"
     }
   },
   "routes": [
