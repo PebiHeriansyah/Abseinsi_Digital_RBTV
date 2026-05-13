@@ -2,7 +2,9 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>Kartu Karyawan</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<base href="{{ rtrim(config('app.url'), '/') }}/">
+<title>Kartu Karyawan - {{ $karyawan->nama_depan }} {{ $karyawan->nama_belakang }}</title>
 
 <style>
 @page {
@@ -154,7 +156,12 @@ body {
 
     {{-- FOTO --}}
     @if(isset($fotoUrl) && $fotoUrl)
-        <img src="{{ $fotoUrl }}" class="foto">
+        <img src="{{ $fotoUrl }}" class="foto" crossorigin="anonymous" onerror="this.style.display='none'">
+    @else
+        {{-- Placeholder jika tidak ada foto --}}
+        <div class="foto" style="display:flex;align-items:center;justify-content:center;background:#e0e0e0;font-size:18pt;color:#999;">
+            {{ strtoupper(substr($karyawan->nama_depan, 0, 1)) }}
+        </div>
     @endif
 
     <div class="content">
@@ -169,7 +176,7 @@ body {
 
     {{-- LOGO --}}
     <div class="logo">
-        <img src="/images/RBTV.png" onerror="this.style.display='none'">
+        <img src="{{ $logoUrl }}" onerror="this.style.display='none'">       
     </div>
 
 </div>

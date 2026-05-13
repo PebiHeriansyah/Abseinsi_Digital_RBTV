@@ -4,14 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Karyawan;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
-use BaconQrCode\Renderer\Image\SvgImageBackEnd;
-use BaconQrCode\Renderer\ImageRenderer;
-use BaconQrCode\Renderer\RendererStyle\RendererStyle;
-use BaconQrCode\Writer;
 
 class KaryawanController extends Controller
 {
@@ -135,62 +130,34 @@ class KaryawanController extends Controller
     {
         $karyawan = Karyawan::findOrFail($id);
 
-        // =====================================================
-        // QR CODE — dibuat LOKAL pakai BaconQrCode (SVG)
-        // ZERO HTTP request: tidak butuh internet sama sekali
-        // =====================================================
-        $renderer = new ImageRenderer(
-            new RendererStyle(150),
-            new SvgImageBackEnd()
-        );
-        $writer = new Writer($renderer);
-        $qrSvg  = $writer->writeString($karyawan->nik);
-
-        // =====================================================
-        // FOTO KARYAWAN — ambil dari Supabase dengan timeout singkat
-        // =====================================================
-        $fotoBase64 = null;
+        // Buat URL foto — mendukung Supabase (production) dan disk lokal (development)
+        $fotoUrl = null;
         if (!empty($karyawan->foto)) {
-            try {
+            $disk = config('filesystems.default', 'public');
+
+            if ($disk === 'supabase') {
+                // Production: gunakan Supabase public URL
                 $supabasePublicUrl = env('SUPABASE_STORAGE_URL', '');
                 if ($supabasePublicUrl) {
                     $fotoUrl = rtrim($supabasePublicUrl, '/') . '/' . ltrim($karyawan->foto, '/');
-                    $ch = curl_init();
-                    curl_setopt_array($ch, [
-                        CURLOPT_URL            => $fotoUrl,
-                        CURLOPT_RETURNTRANSFER => true,
-                        CURLOPT_FOLLOWLOCATION => true,
-                        CURLOPT_TIMEOUT        => 5,  // timeout singkat
-                        CURLOPT_SSL_VERIFYPEER => false,
-                    ]);
-                    $fotoData = curl_exec($ch);
-                    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-                    curl_close($ch);
-
-                    if ($fotoData && $httpCode >= 200 && $httpCode < 300) {
-                        $ext  = strtolower(pathinfo($karyawan->foto, PATHINFO_EXTENSION)) ?: 'jpeg';
-                        $mime = in_array($ext, ['jpg', 'jpeg']) ? 'jpeg' : $ext;
-                        $fotoBase64 = 'data:image/' . $mime . ';base64,' . base64_encode($fotoData);
-                    }
                 }
-            } catch (\Exception $e) {
-                $fotoBase64 = null; // kartu tetap dicetak tanpa foto
+            } else {
+                // Lokal: gunakan URL dari Storage disk (public/local)
+                try {
+                    $fotoUrl = Storage::disk($disk)->url($karyawan->foto);
+                } catch (\Exception $e) {
+                    $fotoUrl = null;
+                }
             }
         }
 
-        // =====================================================
-        // LOGO — file lokal, encode base64 agar DomPDF render
-        // =====================================================
-        $logoBase64 = null;
-        $logoPath   = public_path('images/RBTV.png');
-        if (file_exists($logoPath)) {
-            $logoBase64 = 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath));
-        }
+        // QR code: generate sebagai data URI agar tidak bergantung pada internet
+        $qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' . urlencode($karyawan->nik);
 
-        $pdf = Pdf::loadView('admin.karyawan.kartu', compact('karyawan', 'fotoBase64', 'qrSvg', 'logoBase64'))
-            ->setPaper([0, 0, 153.07, 242.65], 'portrait');
+        // URL absolut logo untuk memastikan load benar di semua environment
+        $logoUrl = rtrim(config('app.url'), '/') . '/images/RBTV.png';
 
-        return $pdf->stream('kartu-' . $karyawan->nama_depan . '.pdf');
+        return view('admin.karyawan.kartu', compact('karyawan', 'fotoUrl', 'qrUrl', 'logoUrl'));
     }
 
     public function destroy(Request $request, $id)
