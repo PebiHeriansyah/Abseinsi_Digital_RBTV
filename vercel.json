@@ -30,8 +30,26 @@
     }
   ],
   "env": {
+    "APP_NAME": "Absensi RBTV",
     "APP_ENV": "production",
-    "APP_DEBUG": "false",
-    "LOG_CHANNEL": "stderr"
+    "APP_KEY": "base64:QW90OzzG/sjDNhuYuHo9oAmBk0zLhaoyIyQkDAKTb1g=",
+    "APP_DEBUG": "true",
+    "APP_URL": "https://abseinsi-digital-rbtv.vercel.app",
+    "LOG_CHANNEL": "stderr",
+    "DB_CONNECTION": "pgsql",
+    "DB_HOST": "db.ubzqxbnlzqglwwmyjpvc.supabase.co",
+    "DB_PORT": "5432",
+    "DB_DATABASE": "postgres",
+    "DB_USERNAME": "postgres",
+    "DB_PASSWORD": "#0987654123Feby",
+    "SESSION_DRIVER": "cookie",
+    "SESSION_LIFETIME": "120",
+    "FILESYSTEM_DISK": "supabase",
+    "SUPABASE_S3_KEY": "5cbccc3c95d853154332c548d60bdd8c",
+    "SUPABASE_S3_SECRET": "b1e9ad06d1750f4e57d8c80ac903c40275d1a46b35b6b14e309545838c49a770",
+    "SUPABASE_S3_REGION": "ap-south-1",
+    "SUPABASE_S3_BUCKET": "absensi-rbtv",
+    "SUPABASE_S3_ENDPOINT": "https://ubzqxbnlzqglwwmyjpvc.storage.supabase.co/storage/v1/s3",
+    "SUPABASE_STORAGE_URL": "https://ubzqxbnlzqglwwmyjpvc.supabase.co/storage/v1/object/public"
   }
 }
