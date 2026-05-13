@@ -68,7 +68,7 @@
                                 <td class="text-start">
                                     <div class="d-flex justify-content-start align-items-center gap-3">
                                         @if($d->foto)
-                                            <img src="{{ asset('storage/'.$d->foto) }}" alt="Foto" class="rounded-circle border" width="55" height="55" style="object-fit: cover;">
+                                            <img src="{{ \Illuminate\Support\Facades\Storage::disk(config('filesystems.default', 'public'))->url($d->foto) }}" alt="Foto" class="rounded-circle border" width="55" height="55" style="object-fit: cover;">
                                         @else
                                             <div class="avatar avatar-md">
                                                 <span class="avatar-initial rounded-circle bg-label-primary fs-4">{{ substr($d->nama_depan, 0, 1) }}</span>

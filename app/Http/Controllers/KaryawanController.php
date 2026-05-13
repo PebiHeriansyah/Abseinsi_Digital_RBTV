@@ -52,7 +52,9 @@ class KaryawanController extends Controller
             'foto' => 'required|image|mimes:jpg,jpeg,png|max:2048'
         ]);
 
-        $fotoPath = $request->file('foto')->store('foto', 'public');
+        // Gunakan disk yang dikonfigurasi: 'public' (lokal) atau 'supabase' (production)
+        $disk = config('filesystems.default', 'public');
+        $fotoPath = $request->file('foto')->store('foto', $disk);
 
         Karyawan::create([
             'nik' => $request->nik,
@@ -110,11 +112,12 @@ class KaryawanController extends Controller
 
         // Jika ada upload foto baru
         if ($request->hasFile('foto')) {
+            $disk = config('filesystems.default', 'public');
             if ($karyawan->foto) {
-                Storage::disk('public')->delete($karyawan->foto);
+                Storage::disk($disk)->delete($karyawan->foto);
             }
             
-            $fotoPath = $request->file('foto')->store('foto', 'public');
+            $fotoPath = $request->file('foto')->store('foto', $disk);
             $dataUpdate['foto'] = $fotoPath;
         }
 
@@ -130,12 +133,16 @@ class KaryawanController extends Controller
 
         $fotoBase64 = null;
         if (!empty($karyawan->foto)) {
-            $path = storage_path('app/public/' . $karyawan->foto);
-
-            if (file_exists($path)) {
-                $type = pathinfo($path, PATHINFO_EXTENSION);
-                $data = file_get_contents($path);
-                $fotoBase64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+            try {
+                $disk = config('filesystems.default', 'public');
+                if (Storage::disk($disk)->exists($karyawan->foto)) {
+                    $data = Storage::disk($disk)->get($karyawan->foto);
+                    $type = pathinfo($karyawan->foto, PATHINFO_EXTENSION) ?: 'jpeg';
+                    $fotoBase64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+                }
+            } catch (\Exception $e) {
+                // Abaikan jika foto tidak bisa diakses
+                $fotoBase64 = null;
             }
         }
 
@@ -165,7 +172,8 @@ class KaryawanController extends Controller
         
         // Hapus foto jika ada
         if ($karyawan->foto) {
-            Storage::delete($karyawan->foto);
+            $disk = config('filesystems.default', 'public');
+            Storage::disk($disk)->delete($karyawan->foto);
         }
         
         $karyawan->delete();

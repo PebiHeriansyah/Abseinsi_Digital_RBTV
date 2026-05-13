@@ -137,7 +137,7 @@
 
                         <div id="oldFotoContainer" class="mb-2 mt-1">
                             @if($karyawan->foto)
-                                <img src="{{ asset('storage/'.$karyawan->foto) }}" width="120" height="120" style="border-radius:50%; object-fit: cover; border: 2px solid #696cff;">
+                                <img src="{{ \Illuminate\Support\Facades\Storage::disk(config('filesystems.default', 'public'))->url($karyawan->foto) }}" width="120" height="120" style="border-radius:50%; object-fit: cover; border: 2px solid #696cff;">
                             @endif
                         </div>
 

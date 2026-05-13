@@ -1,0 +1,26 @@
+# Dependencies (akan di-install saat build)
+node_modules/
+
+# Storage (ephemeral di Vercel, gunakan Supabase Storage)
+storage/app/public/
+
+# Cache dan log lokal
+storage/framework/cache/
+storage/framework/sessions/
+storage/framework/views/
+storage/logs/
+
+# Database SQLite lokal
+database/database.sqlite
+
+# Test files
+tests/
+
+# IDE files
+.idea/
+.vscode/
+.nova/
+
+# OS files
+.DS_Store
+Thumbs.db
