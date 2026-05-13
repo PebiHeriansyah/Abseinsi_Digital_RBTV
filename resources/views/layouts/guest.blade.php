@@ -15,13 +15,6 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
-        /* Menyesuaikan skala keseluruhan agar tidak terlalu besar di Desktop */
-        @media (min-width: 992px) {
-            html {
-                zoom: 0.9;
-            }
-        }
-
         body, html {
             margin: 0;
             padding: 0;
@@ -77,10 +70,10 @@
         /* Card Form */
         .login-card {
             background: #ffffff;
-            padding: 2rem 1.8rem;
+            padding: 3.5rem 2.5rem;
             border-radius: 16px;
             width: 100%;
-            max-width: 330px;
+            max-width: 400px;
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
             position: relative;
             z-index: 10;
@@ -96,13 +89,13 @@
 
         .login-card p.subtitle {
             color: #8898aa;
-            font-size: 14px;
-            margin-bottom: 25px;
+            font-size: 15px;
+            margin-bottom: 35px;
         }
 
         .input-group {
             position: relative;
-            margin-bottom: 18px;
+            margin-bottom: 22px;
             text-align: left; 
         }
         .input-group .icon-left {
