@@ -10,32 +10,7 @@
   },
   "routes": [
     {
-      "src": "/build/(.*)",
-      "dest": "/build/$1"
-    },
-    {
-      "src": "/storage/(.*)",
-      "dest": "/storage/$1"
-    },
-    {
-      "src": "/images/(.*)",
-      "dest": "/images/$1"
-    },
-    {
-      "src": "/css/(.*)",
-      "dest": "/css/$1"
-    },
-    {
-      "src": "/js/(.*)",
-      "dest": "/js/$1"
-    },
-    {
-      "src": "/(sneat|gradient|monster)/(.*)",
-      "dest": "/$1/$2"
-    },
-    {
-      "src": "/favicon\\.ico",
-      "dest": "/favicon.ico"
+      "handle": "filesystem"
     },
     {
       "src": "/(.*)",
