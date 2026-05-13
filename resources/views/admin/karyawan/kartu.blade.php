@@ -152,8 +152,8 @@ body {
     </div>
 
     {{-- FOTO --}}
-    @if($fotoBase64)
-        <img src="{{ $fotoBase64 }}" class="foto">
+    @if(isset($fotoUrl) && $fotoUrl)
+        <img src="{{ $fotoUrl }}" class="foto">
     @endif
 
     <div class="content">
@@ -167,11 +167,9 @@ body {
     </div>
 
     {{-- LOGO --}}
-    @if($logoBase64)
     <div class="logo">
-        <img src="{{ $logoBase64 }}">
+        <img src="{{ asset('images/RBTV.png') }}">
     </div>
-    @endif
 
 </div>
 
@@ -184,9 +182,11 @@ body {
 
     <div class="header"></div>
 
-    {{-- QR CODE — inline SVG langsung, tanpa HTTP request --}}
+    {{-- QR CODE --}}
     <div class="qr-container">
-        {!! $qrSvg !!}
+        @if(isset($qrUrl) && $qrUrl)
+            <img src="{{ $qrUrl }}" style="width: 100%; height: 100%; object-fit: contain;">
+        @endif
     </div>
 
 </div>
