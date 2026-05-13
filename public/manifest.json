@@ -1,0 +1,7 @@
+{
+  "name": "Absensi Digital RBTV",
+  "short_name": "Absensi RBTV",
+  "display": "browser",
+  "start_url": "/",
+  "scope": "/"
+}
