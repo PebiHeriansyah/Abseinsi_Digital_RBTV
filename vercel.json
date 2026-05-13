@@ -1,5 +1,6 @@
 {
   "version": 2,
+  "buildCommand": "npm run build && rm -rf node_modules",
   "framework": null,
   "functions": {
     "api/index.php": {
