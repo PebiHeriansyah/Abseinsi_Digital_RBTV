@@ -17,6 +17,7 @@ body {
 
 * {
     -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
     box-sizing: border-box;
 }
 
@@ -168,7 +169,7 @@ body {
 
     {{-- LOGO --}}
     <div class="logo">
-        <img src="{{ asset('images/RBTV.png') }}">
+        <img src="/images/RBTV.png" onerror="this.style.display='none'">
     </div>
 
 </div>
@@ -191,5 +192,13 @@ body {
 
 </div>
 
+<script>
+    window.onload = function() {
+        // Otomatis buka dialog print saat halaman selesai dimuat
+        setTimeout(function() {
+            window.print();
+        }, 500);
+    };
+</script>
 </body>
 </html>
