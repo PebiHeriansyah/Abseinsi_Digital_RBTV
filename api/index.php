@@ -16,6 +16,16 @@ try {
     // Tentukan root aplikasi
     $appRoot = __DIR__ . '/..';
 
+    // Salin $_SERVER dan $_ENV ke putenv agar Laravel bisa membacanya dengan getenv()
+    foreach ($_ENV as $key => $value) {
+        putenv("$key=$value");
+    }
+    foreach ($_SERVER as $key => $value) {
+        if (is_string($value)) {
+            putenv("$key=$value");
+        }
+    }
+
     // Di Vercel, filesystem adalah read-only kecuali /tmp
     $tmpStorage = '/tmp/storage';
     $tmpBootstrapCache = '/tmp/bootstrap/cache';
@@ -44,6 +54,9 @@ try {
 
     // Override storage path ke /tmp
     $app->useStoragePath($tmpStorage);
+    
+    // Override path cache agar menggunakan /tmp (penting untuk Laravel 11 di Vercel)
+    $app->useBootstrapPath('/tmp/bootstrap');
 
     // Handle request
     $kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
@@ -70,14 +83,13 @@ try {
         echo "=== PREVIOUS ERROR ===\n";
         echo "Message: " . $prev->getMessage() . "\n";
         echo "File: " . $prev->getFile() . "\n";
-        echo "Line: " . $prev->getLine() . "\n";
+        echo "Line: " . $prev->getLine() . "\n\n";
     }
     
-    // Tampilkan env vars yang terdeteksi (tanpa value sensitif)
-    echo "\n=== ENV CHECK ===\n";
-    echo "APP_ENV: " . (getenv('APP_ENV') ?: 'NOT SET') . "\n";
-    echo "APP_KEY: " . (getenv('APP_KEY') ? 'SET' : 'NOT SET') . "\n";
-    echo "DB_CONNECTION: " . (getenv('DB_CONNECTION') ?: 'NOT SET') . "\n";
-    echo "DB_HOST: " . (getenv('DB_HOST') ? 'SET' : 'NOT SET') . "\n";
-    echo "FILESYSTEM_DISK: " . (getenv('FILESYSTEM_DISK') ?: 'NOT SET') . "\n";
+    // Tampilkan env vars yang terdeteksi (HANYA KUNCI, BUKAN NILAI RAHASIANYA)
+    echo "=== $_ENV KEYS ===\n";
+    echo implode(', ', array_keys($_ENV)) . "\n\n";
+    
+    echo "=== $_SERVER KEYS ===\n";
+    echo implode(', ', array_keys($_SERVER)) . "\n\n";
 }
