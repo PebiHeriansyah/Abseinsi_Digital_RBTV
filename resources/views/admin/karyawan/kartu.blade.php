@@ -117,17 +117,19 @@ body {
     width: 20mm;
 }
 
-/* QR BELAKANG */
+/* QR BELAKANG — Tengah vertikal & horizontal */
 .qr-container {
     position: absolute;
-    top: 18mm;
+    top: 50%;
     left: 50%;
-    transform: translateX(-50%);
-    width: 34mm;
-    height: 34mm;
+    transform: translate(-50%, -50%);
+    width: 38mm;
+    height: 38mm;
     background: white;
-    border: 1px solid #cccccc;
+    border: 2px solid #e0e0e0;
+    border-radius: 3mm;
     padding: 2mm;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
 }
 
 /* Pastikan SVG di dalam qr-container mengisi penuh */
@@ -200,12 +202,46 @@ body {
 </div>
 
 <script>
-    window.onload = function() {
-        // Otomatis buka dialog print saat halaman selesai dimuat
-        setTimeout(function() {
-            window.print();
-        }, 500);
-    };
+    // Tunggu semua gambar selesai dimuat sebelum membuka dialog print
+    function triggerPrint() {
+        var images = document.querySelectorAll('img');
+        var total = images.length;
+
+        if (total === 0) {
+            // Tidak ada gambar, langsung print
+            setTimeout(function() { window.print(); }, 300);
+            return;
+        }
+
+        var loaded = 0;
+
+        function checkAllLoaded() {
+            loaded++;
+            if (loaded >= total) {
+                // Semua gambar sudah siap, buka dialog cetak
+                setTimeout(function() { window.print(); }, 300);
+            }
+        }
+
+        images.forEach(function(img) {
+            if (img.complete) {
+                checkAllLoaded();
+            } else {
+                img.addEventListener('load', checkAllLoaded);
+                img.addEventListener('error', checkAllLoaded); // tetap lanjut meski gambar gagal
+            }
+        });
+
+        // Fallback: paksa buka print setelah 3 detik jika gambar lama
+        setTimeout(function() { window.print(); }, 3000);
+    }
+
+    // Jalankan setelah DOM selesai
+    if (document.readyState === 'complete') {
+        triggerPrint();
+    } else {
+        window.addEventListener('load', triggerPrint);
+    }
 </script>
 </body>
 </html>
