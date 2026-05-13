@@ -37,6 +37,8 @@ try {
         $tmpStorage . '/framework/sessions',
         $tmpStorage . '/framework/views',
         $tmpStorage . '/logs',
+        $tmpStorage . '/fonts',   // ← DomPDF font cache (WAJIB writable)
+        '/tmp/dompdf',            // ← DomPDF temp dir
         $tmpBootstrapCache,
     ];
 

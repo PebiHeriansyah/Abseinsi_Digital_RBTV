@@ -132,67 +132,59 @@ class KaryawanController extends Controller
         $karyawan = Karyawan::findOrFail($id);
 
         // =====================================================
-        // FOTO KARYAWAN — ambil dari Supabase/Storage sebagai base64
+        // FOTO KARYAWAN
+        // Ambil langsung dari URL publik Supabase via cURL
+        // (lebih reliable daripada Storage::disk() di serverless)
         // =====================================================
         $fotoBase64 = null;
         if (!empty($karyawan->foto)) {
             try {
-                $disk = config('filesystems.default', 'public');
-                // Coba ambil via Storage::get() terlebih dahulu
-                if (Storage::disk($disk)->exists($karyawan->foto)) {
-                    $data = Storage::disk($disk)->get($karyawan->foto);
-                    $type = pathinfo($karyawan->foto, PATHINFO_EXTENSION) ?: 'jpeg';
-                    $fotoBase64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+                $supabasePublicUrl = env('SUPABASE_STORAGE_URL', '');
+                if ($supabasePublicUrl) {
+                    $fotoUrl  = rtrim($supabasePublicUrl, '/') . '/' . ltrim($karyawan->foto, '/');
+                    $fotoData = $this->fetchUrlAsBase64($fotoUrl);
+                    if ($fotoData) {
+                        $ext = strtolower(pathinfo($karyawan->foto, PATHINFO_EXTENSION)) ?: 'jpeg';
+                        $mime = in_array($ext, ['jpg', 'jpeg']) ? 'jpeg' : $ext;
+                        $fotoBase64 = 'data:image/' . $mime . ';base64,' . $fotoData;
+                    }
                 }
             } catch (\Exception $e) {
-                // Fallback: coba fetch via URL publik Supabase
-                try {
-                    $supabasePublicUrl = env('SUPABASE_STORAGE_URL');
-                    if ($supabasePublicUrl) {
-                        $fotoUrl = rtrim($supabasePublicUrl, '/') . '/' . $karyawan->foto;
-                        $fotoData = $this->fetchUrlAsBase64($fotoUrl);
-                        if ($fotoData) {
-                            $type = pathinfo($karyawan->foto, PATHINFO_EXTENSION) ?: 'jpeg';
-                            $fotoBase64 = 'data:image/' . $type . ';base64,' . $fotoData;
-                        }
-                    }
-                } catch (\Exception $e2) {
-                    $fotoBase64 = null;
-                }
+                $fotoBase64 = null;
             }
         }
 
         // =====================================================
-        // QR CODE — gunakan cURL karena file_get_contents
-        //           diblokir di environment Vercel (serverless)
+        // QR CODE
+        // Gunakan cURL (file_get_contents diblokir di Vercel)
         // =====================================================
         $qrBase64 = null;
         try {
-            $qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' . urlencode($karyawan->nik);
+            $qrUrl  = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' . urlencode($karyawan->nik);
             $qrData = $this->fetchUrlAsBase64($qrUrl);
             if ($qrData) {
                 $qrBase64 = 'data:image/png;base64,' . $qrData;
             }
         } catch (\Exception $e) {
-            // QR gagal dibuat, kartu tetap di-generate tanpa QR
             $qrBase64 = null;
         }
 
         // =====================================================
-        // LOGO — encode ke base64 agar DomPDF bisa render
-        //        di serverless (tidak bisa akses public_path)
+        // LOGO — file lokal, encode base64 agar DomPDF render
+        // (DomPDF tidak bisa load file via path relatif di Vercel)
         // =====================================================
         $logoBase64 = null;
-        $logoPath = public_path('images/RBTV.png');
+        $logoPath   = public_path('images/RBTV.png');
         if (file_exists($logoPath)) {
-            $logoData = file_get_contents($logoPath);
-            $logoBase64 = 'data:image/png;base64,' . base64_encode($logoData);
+            $logoBase64 = 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath));
         }
 
+        // Pastikan DomPDF menulis font ke /tmp (writable di Vercel)
+        // Path ini di-configure di config/dompdf.php
         $pdf = Pdf::loadView('admin.karyawan.kartu', compact('karyawan', 'fotoBase64', 'qrBase64', 'logoBase64'))
             ->setPaper([0, 0, 153.07, 242.65], 'portrait');
 
-        return $pdf->stream('kartu-'.$karyawan->nama_depan.'.pdf');
+        return $pdf->stream('kartu-' . $karyawan->nama_depan . '.pdf');
     }
 
     /**
