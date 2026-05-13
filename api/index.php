@@ -5,54 +5,79 @@
  * File ini memboot Laravel dan meneruskan semua request ke aplikasi.
  */
 
-define('LARAVEL_START', microtime(true));
+// Tampilkan error sementara untuk debugging
+ini_set('display_errors', '1');
+ini_set('display_startup_errors', '1');
+error_reporting(E_ALL);
 
-// Tentukan root aplikasi
-$appRoot = __DIR__ . '/..';
+try {
+    define('LARAVEL_START', microtime(true));
 
-// Di Vercel, filesystem adalah read-only kecuali /tmp
-// Kita perlu membuat symlink storage ke /tmp agar Laravel bisa menulis
-$tmpStorage = '/tmp/storage';
-$tmpBootstrapCache = '/tmp/bootstrap/cache';
+    // Tentukan root aplikasi
+    $appRoot = __DIR__ . '/..';
 
-// Buat direktori yang dibutuhkan di /tmp
-$dirs = [
-    $tmpStorage . '/app/public',
-    $tmpStorage . '/framework/cache/data',
-    $tmpStorage . '/framework/sessions',
-    $tmpStorage . '/framework/views',
-    $tmpStorage . '/logs',
-    $tmpBootstrapCache,
-];
+    // Di Vercel, filesystem adalah read-only kecuali /tmp
+    $tmpStorage = '/tmp/storage';
+    $tmpBootstrapCache = '/tmp/bootstrap/cache';
 
-foreach ($dirs as $dir) {
-    if (!is_dir($dir)) {
-        mkdir($dir, 0755, true);
+    // Buat direktori yang dibutuhkan di /tmp
+    $dirs = [
+        $tmpStorage . '/app/public',
+        $tmpStorage . '/framework/cache/data',
+        $tmpStorage . '/framework/sessions',
+        $tmpStorage . '/framework/views',
+        $tmpStorage . '/logs',
+        $tmpBootstrapCache,
+    ];
+
+    foreach ($dirs as $dir) {
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
     }
+
+    // Autoload Composer
+    require $appRoot . '/vendor/autoload.php';
+
+    // Boot aplikasi Laravel
+    $app = require_once $appRoot . '/bootstrap/app.php';
+
+    // Override storage path ke /tmp
+    $app->useStoragePath($tmpStorage);
+
+    // Handle request
+    $kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
+
+    $response = $kernel->handle(
+        $request = Illuminate\Http\Request::capture()
+    )->send();
+
+    $kernel->terminate($request, $response);
+
+} catch (\Throwable $e) {
+    // Tampilkan error untuk debugging
+    http_response_code(500);
+    header('Content-Type: text/plain');
+    echo "=== LARAVEL ERROR ===\n\n";
+    echo "Message: " . $e->getMessage() . "\n\n";
+    echo "File: " . $e->getFile() . "\n";
+    echo "Line: " . $e->getLine() . "\n\n";
+    echo "=== STACK TRACE ===\n";
+    echo $e->getTraceAsString() . "\n\n";
+    
+    // Cek juga previous exception
+    if ($prev = $e->getPrevious()) {
+        echo "=== PREVIOUS ERROR ===\n";
+        echo "Message: " . $prev->getMessage() . "\n";
+        echo "File: " . $prev->getFile() . "\n";
+        echo "Line: " . $prev->getLine() . "\n";
+    }
+    
+    // Tampilkan env vars yang terdeteksi (tanpa value sensitif)
+    echo "\n=== ENV CHECK ===\n";
+    echo "APP_ENV: " . (getenv('APP_ENV') ?: 'NOT SET') . "\n";
+    echo "APP_KEY: " . (getenv('APP_KEY') ? 'SET' : 'NOT SET') . "\n";
+    echo "DB_CONNECTION: " . (getenv('DB_CONNECTION') ?: 'NOT SET') . "\n";
+    echo "DB_HOST: " . (getenv('DB_HOST') ? 'SET' : 'NOT SET') . "\n";
+    echo "FILESYSTEM_DISK: " . (getenv('FILESYSTEM_DISK') ?: 'NOT SET') . "\n";
 }
-
-// Override storage path ke /tmp
-$_ENV['APP_STORAGE_PATH'] = $tmpStorage;
-
-// Autoload Composer
-require $appRoot . '/vendor/autoload.php';
-
-// Boot aplikasi Laravel
-$app = require_once $appRoot . '/bootstrap/app.php';
-
-// Override storage path
-$app->useStoragePath($tmpStorage);
-
-// Override bootstrap cache path
-$app->instance('path.config_cache', $tmpBootstrapCache . '/config.php');
-$app->instance('path.routes_cache', $tmpBootstrapCache . '/routes-v7.php');
-$app->instance('path.events_cache', $tmpBootstrapCache . '/events.php');
-
-// Handle request
-$kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
-
-$response = $kernel->handle(
-    $request = Illuminate\Http\Request::capture()
-)->send();
-
-$kernel->terminate($request, $response);
