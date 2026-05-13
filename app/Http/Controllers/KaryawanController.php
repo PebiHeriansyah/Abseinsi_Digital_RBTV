@@ -131,30 +131,95 @@ class KaryawanController extends Controller
     {
         $karyawan = Karyawan::findOrFail($id);
 
+        // =====================================================
+        // FOTO KARYAWAN — ambil dari Supabase/Storage sebagai base64
+        // =====================================================
         $fotoBase64 = null;
         if (!empty($karyawan->foto)) {
             try {
                 $disk = config('filesystems.default', 'public');
+                // Coba ambil via Storage::get() terlebih dahulu
                 if (Storage::disk($disk)->exists($karyawan->foto)) {
                     $data = Storage::disk($disk)->get($karyawan->foto);
                     $type = pathinfo($karyawan->foto, PATHINFO_EXTENSION) ?: 'jpeg';
                     $fotoBase64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
                 }
             } catch (\Exception $e) {
-                // Abaikan jika foto tidak bisa diakses
-                $fotoBase64 = null;
+                // Fallback: coba fetch via URL publik Supabase
+                try {
+                    $supabasePublicUrl = env('SUPABASE_STORAGE_URL');
+                    if ($supabasePublicUrl) {
+                        $fotoUrl = rtrim($supabasePublicUrl, '/') . '/' . $karyawan->foto;
+                        $fotoData = $this->fetchUrlAsBase64($fotoUrl);
+                        if ($fotoData) {
+                            $type = pathinfo($karyawan->foto, PATHINFO_EXTENSION) ?: 'jpeg';
+                            $fotoBase64 = 'data:image/' . $type . ';base64,' . $fotoData;
+                        }
+                    }
+                } catch (\Exception $e2) {
+                    $fotoBase64 = null;
+                }
             }
         }
 
-        // QR Code digenerate langsung dari API, jadi data di database diabaikan
-        $qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" . urlencode($karyawan->nik);
-        $qrImage = file_get_contents($qrUrl);
-        $qrBase64 = 'data:image/png;base64,' . base64_encode($qrImage);
+        // =====================================================
+        // QR CODE — gunakan cURL karena file_get_contents
+        //           diblokir di environment Vercel (serverless)
+        // =====================================================
+        $qrBase64 = null;
+        try {
+            $qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' . urlencode($karyawan->nik);
+            $qrData = $this->fetchUrlAsBase64($qrUrl);
+            if ($qrData) {
+                $qrBase64 = 'data:image/png;base64,' . $qrData;
+            }
+        } catch (\Exception $e) {
+            // QR gagal dibuat, kartu tetap di-generate tanpa QR
+            $qrBase64 = null;
+        }
 
-        $pdf = Pdf::loadView('admin.karyawan.kartu', compact('karyawan', 'fotoBase64', 'qrBase64'))
+        // =====================================================
+        // LOGO — encode ke base64 agar DomPDF bisa render
+        //        di serverless (tidak bisa akses public_path)
+        // =====================================================
+        $logoBase64 = null;
+        $logoPath = public_path('images/RBTV.png');
+        if (file_exists($logoPath)) {
+            $logoData = file_get_contents($logoPath);
+            $logoBase64 = 'data:image/png;base64,' . base64_encode($logoData);
+        }
+
+        $pdf = Pdf::loadView('admin.karyawan.kartu', compact('karyawan', 'fotoBase64', 'qrBase64', 'logoBase64'))
             ->setPaper([0, 0, 153.07, 242.65], 'portrait');
 
         return $pdf->stream('kartu-'.$karyawan->nama_depan.'.pdf');
+    }
+
+    /**
+     * Fetch konten URL menggunakan cURL dan return sebagai base64.
+     * Digunakan karena file_get_contents() untuk URL eksternal
+     * tidak berfungsi di serverless environment (Vercel).
+     */
+    private function fetchUrlAsBase64(string $url): ?string
+    {
+        $ch = curl_init();
+        curl_setopt_array($ch, [
+            CURLOPT_URL            => $url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_TIMEOUT        => 15,
+            CURLOPT_SSL_VERIFYPEER => true,
+            CURLOPT_USERAGENT      => 'Mozilla/5.0 (compatible; AbsensiRBTV/1.0)',
+        ]);
+        $data     = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($data === false || $httpCode < 200 || $httpCode >= 300) {
+            return null;
+        }
+
+        return base64_encode($data);
     }
 
     public function destroy(Request $request, $id)

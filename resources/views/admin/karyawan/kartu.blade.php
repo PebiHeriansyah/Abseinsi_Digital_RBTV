@@ -162,9 +162,11 @@ body {
     </div>
 
     {{-- LOGO --}}
+    @if($logoBase64)
     <div class="logo">
-        <img src="{{ $logoBase64 ?? public_path('images/RBTV.png') }}">
+        <img src="{{ $logoBase64 }}">
     </div>
+    @endif
 
 </div>
 
