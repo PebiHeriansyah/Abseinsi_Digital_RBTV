@@ -18,6 +18,10 @@
         html {
             zoom: 0.85;
         }
+        html, body {
+            height: 117.647vh !important; /* Kompensasi untuk zoom 0.85 */
+            min-height: 117.647vh !important;
+        }
     }
 
     /* Mengubah warna latar belakang utama dan teks */
