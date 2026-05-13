@@ -11,7 +11,7 @@ storage/logs/
 # Asset template berat yang di-serve langsung oleh CDN Vercel, bukan PHP function
 public/gradient/
 public/monster/
-public/sneat/
+# public/sneat/ - DIBUTUHKAN untuk CSS admin dashboard
 
 # Database lokal
 database/database.sqlite
