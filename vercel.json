@@ -25,7 +25,7 @@
     "APP_NAME": "Absensi RBTV",
     "APP_ENV": "production",
     "APP_KEY": "base64:QW90OzzG/sjDNhuYuHo9oAmBk0zLhaoyIyQkDAKTb1g=",
-    "APP_DEBUG": "true",
+    "APP_DEBUG": "false",
     "APP_URL": "https://abseinsi-digital-rbtv.vercel.app",
     "LOG_CHANNEL": "stderr",
     "DB_CONNECTION": "pgsql",
@@ -45,7 +45,6 @@
     "SUPABASE_STORAGE_URL": "https://ubzqxbnlzqglwwmyjpvc.supabase.co/storage/v1/object/public/absensi-rbtv",
     "CACHE_DRIVER": "file",
     "CACHE_STORE": "file",
-    "DB_SSLMODE": "require",
-    "MIGRATE_SECRET": "rbtv-migrate-2024"
+    "DB_SSLMODE": "require"
   }
 }
