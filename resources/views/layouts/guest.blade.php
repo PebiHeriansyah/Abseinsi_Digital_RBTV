@@ -70,10 +70,10 @@
         /* Card Form */
         .login-card {
             background: #ffffff;
-            padding: 3.5rem 2.5rem;
+            padding: 2.5rem 2rem;
             border-radius: 16px;
             width: 100%;
-            max-width: 400px;
+            max-width: 360px;
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
             position: relative;
             z-index: 10;

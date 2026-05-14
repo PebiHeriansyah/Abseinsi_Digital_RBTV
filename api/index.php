@@ -33,7 +33,9 @@ try {
     // Buat direktori yang dibutuhkan di /tmp
     $dirs = [
         $tmpStorage . '/app/public',
+        $tmpStorage . '/app/private', // ← untuk temporary file internal Laravel
         $tmpStorage . '/framework/cache/data',
+        $tmpStorage . '/framework/cache/laravel-excel', // ← untuk export Excel
         $tmpStorage . '/framework/sessions',
         $tmpStorage . '/framework/views',
         $tmpStorage . '/logs',
