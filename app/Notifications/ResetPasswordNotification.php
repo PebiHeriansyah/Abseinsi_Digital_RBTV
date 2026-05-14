@@ -34,12 +34,6 @@ class ResetPasswordNotification extends Notification
 
         return (new MailMessage)
             ->subject('Reset Kata Sandi - ' . config('app.name'))
-            ->greeting('Halo!')
-            ->line('Anda menerima email ini karena kami menerima permintaan reset kata sandi untuk akun Anda.')
-            ->action('Reset Kata Sandi', $url)
-            ->line('Link reset kata sandi ini akan kedaluwarsa dalam **60 menit**.')
-            ->line('Jika Anda tidak meminta reset kata sandi, abaikan email ini. Tidak ada perubahan yang akan terjadi.')
-            ->salutation('Salam,')
-            ->salutation('Tim ' . config('app.name'));
+            ->view('emails.reset-password', ['url' => $url]);
     }
 }
