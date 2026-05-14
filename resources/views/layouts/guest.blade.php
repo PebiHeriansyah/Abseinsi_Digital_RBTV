@@ -70,10 +70,10 @@
         /* Card Form */
         .login-card {
             background: #ffffff;
-            padding: 2.5rem 2rem;
+            padding: 2rem 1.8rem;
             border-radius: 16px;
             width: 100%;
-            max-width: 360px;
+            max-width: 330px;
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
             position: relative;
             z-index: 10;
@@ -89,13 +89,13 @@
 
         .login-card p.subtitle {
             color: #8898aa;
-            font-size: 15px;
-            margin-bottom: 35px;
+            font-size: 14px;
+            margin-bottom: 25px;
         }
 
         .input-group {
             position: relative;
-            margin-bottom: 22px;
+            margin-bottom: 18px;
             text-align: left; 
         }
         .input-group .icon-left {
