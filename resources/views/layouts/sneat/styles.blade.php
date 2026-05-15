@@ -94,6 +94,24 @@
         background-color: #2b2c40 !important;
         color: #a1b0cb !important;
     }
+
+    /* Fix Footer agar selalu di bawah */
+    .layout-wrapper, .layout-container, .layout-page {
+        min-height: 100vh;
+    }
+    @media (min-width: 992px) {
+        .layout-wrapper, .layout-container, .layout-page {
+            min-height: 117.647vh !important;
+        }
+    }
+    .content-wrapper {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+    }
+    .content-footer {
+        margin-top: auto;
+    }
 </style>
 
 <script src="{{ asset('sneat/assets/vendor/js/helpers.js') }}"></script>
