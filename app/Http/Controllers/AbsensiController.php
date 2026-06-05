@@ -21,12 +21,12 @@ class AbsensiController extends Controller
         $lat = $request->latitude;
         $lng = $request->longitude;
 
-        // 🔥 WAJIB: Ambil waktu berdasarkan zona waktu Jakarta dengan format yang konsisten
+        // Ambil waktu saat ini berdasarkan zona waktu Jakarta
         $waktuSekarang = Carbon::now('Asia/Jakarta');
         $today = $waktuSekarang->toDateString();
         $jamSekarang = $waktuSekarang->format('H:i:s');
 
-        // 🔍 CEK KARYAWAN
+        // Cek data karyawan berdasarkan NIK
         $karyawan = Karyawan::where('nik', $nik)->first();
 
         if (!$karyawan) {
@@ -36,7 +36,7 @@ class AbsensiController extends Controller
             ]);
         }
 
-        // 🔥 VALIDASI GPS
+        // Validasi koordinat GPS
         if (!$lat || !$lng || $lat == 0 || $lng == 0) {
             return response()->json([
                 'status' => 'error',
@@ -44,7 +44,7 @@ class AbsensiController extends Controller
             ]);
         }
 
-        // 🔍 CEK LOKASI
+        // Cek pengaturan lokasi kantor
         $lokasi = Lokasi::first();
 
         if (!$lokasi) {
@@ -54,7 +54,7 @@ class AbsensiController extends Controller
             ]);
         }
 
-        // 📏 HITUNG JARAK
+        // Hitung jarak antara posisi karyawan dan kantor (Haversine formula)
         $jarak = $this->hitungJarak(
             $lat,
             $lng,
@@ -62,7 +62,7 @@ class AbsensiController extends Controller
             $lokasi->longitude
         );
 
-        // 🔥 TOLERANSI GPS (50 meter)
+        // Toleransi GPS sebesar 50 meter untuk mengakomodasi ketidakakuratan sinyal
         $toleransi = 50;
 
         if ($jarak > ($lokasi->radius + $toleransi)) {
@@ -72,12 +72,12 @@ class AbsensiController extends Controller
             ]);
         }
 
-        // 🔍 CEK ABSEN HARI INI
+        // Cek apakah karyawan sudah memiliki catatan absensi hari ini
         $absensi = Absensi::where('karyawan_id', $karyawan->id)
             ->where('tanggal', $today)
             ->first();
 
-        // 🔥 ANTI DOUBLE SCAN (Cegah scan berulang dalam 10 detik)
+        // Cegah double scan: tolak jika scan dilakukan dalam interval kurang dari 10 detik
         if ($absensi && $absensi->updated_at > $waktuSekarang->copy()->subSeconds(10)) {
             return response()->json([
                 'status' => 'error',
@@ -85,9 +85,7 @@ class AbsensiController extends Controller
             ]);
         }
 
-        // ==========================================
-        // 🔥 LOGIKA ABSEN MASUK (PAGI)
-        // ==========================================
+        // --- Logika Absen Masuk (Pagi) ---
         if (!$absensi) {
             
             // Aturan Jam: 06:00:00 - 08:00:00 (Hadir)
@@ -122,9 +120,7 @@ class AbsensiController extends Controller
             ]);
         }
 
-        // ==========================================
-        // 🔥 LOGIKA ABSEN PULANG (SORE)
-        // ==========================================
+        // --- Logika Absen Pulang (Sore) ---
         if (!$absensi->jam_keluar) {
             
             // Keamanan tambahan: Pastikan dia punya jam masuk (tidak absen bolong)

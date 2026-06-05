@@ -2,7 +2,7 @@
 
 namespace App\Exports;
 
-use App\Models\Absensi; // Pastikan model ini sesuai dengan model absensi Anda
+use App\Models\Absensi;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
@@ -10,7 +10,6 @@ use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 
-// Tambahkan implementasi WithMapping dan WithColumnFormatting
 class AbsensiExport implements FromCollection, WithHeadings, WithMapping, ShouldAutoSize, WithColumnFormatting
 {
     protected $tanggal_awal;
@@ -58,14 +57,14 @@ class AbsensiExport implements FromCollection, WithHeadings, WithMapping, Should
         ];
     }
 
-    // Fungsi map() ini berfungsi mengatur data baris per baris sebelum masuk ke Excel
+    // Memetakan data baris per baris sebelum ditulis ke file Excel
     public function map($row): array
     {
         return [
-            // 🔥 Trik NIK: Tambahkan spasi di depan agar Excel membacanya sebagai Teks murni
+            // Tambahkan spasi di depan NIK agar Excel memperlakukannya sebagai teks
             ' ' . $row->karyawan->nik,
             
-            // 🔥 Trik Nama: Gabungkan nama depan dan nama belakang
+            // Gabungkan nama depan dan nama belakang menjadi nama lengkap
             $row->karyawan->nama_depan . ' ' . $row->karyawan->nama_belakang,
             
             $row->tanggal,

@@ -65,7 +65,7 @@ class KaryawanController extends Controller
             'status' => $request->status,
             'alamat' => $request->alamat,
             'foto' => $fotoPath,
-            // 🔥 FIX ERROR 1364: Kita isi qr_code dengan NIK agar database tidak menolak
+            // Isi qr_code dengan NIK agar kolom tidak kosong
             'qr_code' => $request->nik 
         ]);
 
@@ -105,8 +105,8 @@ class KaryawanController extends Controller
             'no_hp' => $request->no_hp,
             'status' => $request->status,
             'alamat' => $request->alamat,
-            // 🔥 PASTIKAN TERISI JUGA SAAT UPDATE
-            'qr_code' => $request->nik 
+            // Sinkronisasi qr_code dengan NIK terbaru
+            'qr_code' => $request->nik,
         ];
 
         // Jika ada upload foto baru

@@ -23,7 +23,7 @@ class LaporanController extends Controller
         // Filter pencarian nama/NIK
         if ($search) {
             $query->whereHas('karyawan', function($q) use ($search) {
-                // 🔥 PERBAIKAN: Menggunakan nama_depan dan nama_belakang
+                // Filter berdasarkan nama depan, nama belakang, atau NIK
                 $q->where('nama_depan', 'like', "%{$search}%")
                   ->orWhere('nama_belakang', 'like', "%{$search}%")
                   ->orWhere('nik', 'like', "%{$search}%");
@@ -32,7 +32,7 @@ class LaporanController extends Controller
 
         $data = $query->orderBy('tanggal', 'desc')->get();
 
-        // 🔥 Statistik (Disesuaikan berdasarkan rentang waktu dan filter)
+        // Hitung statistik kehadiran berdasarkan rentang waktu dan filter yang aktif
         $total = Karyawan::count();
         $hadir = $data->count();
         $telat = $data->where('status', 'telat')->count();
