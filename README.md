@@ -324,15 +324,13 @@ Pastikan file `vercel.json` sudah terkonfigurasi dengan benar sebelum push ke re
 
 ---
 
-## 👨‍💻 Tim Pengembang
+## 👨‍💻 Pengembang
 
-Proyek ini dikembangkan sebagai bagian dari tugas mata kuliah Rekayasa Perangkat Lunak.
+Proyek ini dikembangkan untuk keperluan **Kerja Praktik**.
 
 | Nama | NPM | Peran |
 |------|-----|-------|
-| Pebi Heriansyah | G1A023003 | Ketua / Full-Stack Developer |
-| Reffki | G1A023059 | Backend Developer |
-| Dzaki | — | Frontend Developer |
+| Pebi Heriansyah | G1A023003 | Full-Stack Developer |
 
 ---
 
