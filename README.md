@@ -324,16 +324,6 @@ Pastikan file `vercel.json` sudah terkonfigurasi dengan benar sebelum push ke re
 
 ---
 
-## 👨‍💻 Pengembang
-
-Proyek ini dikembangkan untuk keperluan **Kerja Praktik**.
-
-| Nama | NPM | Peran |
-|------|-----|-------|
-| Pebi Heriansyah | G1A023003 | Full-Stack Developer |
-
----
-
 ## 📄 Lisensi
 
 Proyek ini dibuat untuk keperluan akademis. Seluruh hak cipta dimiliki oleh tim pengembang.
