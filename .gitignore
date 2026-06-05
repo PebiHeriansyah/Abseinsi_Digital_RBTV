@@ -11,6 +11,7 @@
 /.phpunit.cache
 /.vscode
 /.zed
+/.gemini
 /auth.json
 /node_modules
 /public/hot
@@ -18,6 +19,18 @@
 /storage/*.key
 /storage/pail
 _ide_helper.php
+CLAUDE.md
 Homestead.json
 Homestead.yaml
 Thumbs.db
+test_db.php
+test_old_pooler.php
+
+# SQL Schema (may contain sensitive data)
+/neon_schema.sql
+
+# Root Vite artifact (not used by Laravel)
+/index.html
+
+# Template source assets (not referenced by app or Vercel)
+/dist
