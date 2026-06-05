@@ -295,35 +295,6 @@ $toleransi = 50; // meter (nilai default)
 
 ---
 
-## 🌐 Deployment ke Production
-
-Proyek ini mendukung deployment ke **Vercel** dengan database **Supabase (PostgreSQL)** dan storage **Supabase Storage**.
-
-### Konfigurasi `.env` Production
-
-```env
-APP_ENV=production
-APP_DEBUG=false
-APP_URL=https://nama-project.vercel.app
-
-# Database PostgreSQL Supabase
-DB_CONNECTION=pgsql
-DB_URL=postgresql://postgres.[ref]:[password]@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres
-
-# Storage Supabase S3
-FILESYSTEM_DISK=supabase
-SUPABASE_S3_KEY=your_s3_access_key
-SUPABASE_S3_SECRET=your_s3_secret_key
-SUPABASE_S3_REGION=ap-southeast-1
-SUPABASE_S3_BUCKET=absensi-rbtv
-SUPABASE_S3_ENDPOINT=https://[project-ref].supabase.co/storage/v1/s3
-SUPABASE_STORAGE_URL=https://[project-ref].supabase.co/storage/v1/object/public
-```
-
-Pastikan file `vercel.json` sudah terkonfigurasi dengan benar sebelum push ke repository.
-
----
-
 ## 📄 Lisensi
 
 Proyek ini dibuat untuk keperluan akademis. Seluruh hak cipta dimiliki oleh tim pengembang.
